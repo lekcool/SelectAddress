@@ -4,6 +4,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.lek.cool.addresslibrary.AddressManager;
 import com.lek.cool.addresslibrary.OnItemAddressSelectListener;
@@ -14,13 +15,7 @@ import com.lek.cool.addresslibrary.model.SubDistrict;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
-
-    private AddressManager addressManager;
-
-    private Spinner snProvince;
-    private Spinner snDistrict;
-    private Spinner snSubDistrict;
+public class MainActivity extends AppCompatActivity implements OnItemAddressSelectListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,25 +25,25 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initInstance() {
-        snProvince = (Spinner) findViewById(R.id.snProvince);
-        snDistrict = (Spinner) findViewById(R.id.snDistrict);
-        snSubDistrict = (Spinner) findViewById(R.id.snSubDistrict);
+        Spinner snProvince = (Spinner) findViewById(R.id.snProvince);
+        Spinner snDistrict = (Spinner) findViewById(R.id.snDistrict);
+        Spinner snSubDistrict = (Spinner) findViewById(R.id.snSubDistrict);
 
-        addressManager = new AddressManager(this, snProvince, snDistrict, snSubDistrict, new OnItemAddressSelectListener() {
-            @Override
-            public void onProvinceSelect(Province province) {
+        new AddressManager(this, snProvince, snDistrict, snSubDistrict, this);
+    }
 
-            }
+    @Override
+    public void onProvinceSelect(Province province) {
 
-            @Override
-            public void onDistrictSelect(District district) {
+    }
 
-            }
+    @Override
+    public void onDistrictSelect(District district) {
 
-            @Override
-            public void onSubDistrictSelect(SubDistrict subDistrict) {
+    }
 
-            }
-        });
+    @Override
+    public void onSubDistrictSelect(SubDistrict subDistrict) {
+
     }
 }
