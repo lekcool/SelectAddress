@@ -1,1 +1,1 @@
-include ':app', ':addresslib', ':addresslibrary'
+include ':app', ':addresslibrary'
