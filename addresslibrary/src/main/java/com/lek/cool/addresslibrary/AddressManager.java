@@ -13,7 +13,6 @@ import com.lek.cool.addresslibrary.model.Province;
 import com.lek.cool.addresslibrary.model.SubDistrict;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -21,45 +20,42 @@ import java.util.List;
 
 public class AddressManager {
 
-    private List<District> districtsNew;
-    private List<SubDistrict> subDistrictsNew;
-
-    private List<String> districtList;
-    private List<String> subDistrictList;
+    private List<District> districts;
+    private List<SubDistrict> subDistricts;
 
     public AddressManager(final Context context, final Spinner snProvince, final Spinner snDistrict, final Spinner snSubDistrict, final OnItemAddressSelectListener listener) {
-        final List<Province> provinces = new Gson().fromJson(readFromFile("changwats.json", context), new TypeToken<List<Province>>(){}.getType());
-        final List<District> districts = new Gson().fromJson(readFromFile("amphoes.json", context), new TypeToken<List<District>>(){}.getType());
-        final List<SubDistrict> subDistricts = new Gson().fromJson(readFromFile("tambons.json", context), new TypeToken<List<SubDistrict>>(){}.getType());
+        final List<Province> provincesAll = new Gson().fromJson(readFromFile("changwats.json", context), new TypeToken<List<Province>>(){}.getType());
+        final List<District> districtsAll = new Gson().fromJson(readFromFile("amphoes.json", context), new TypeToken<List<District>>(){}.getType());
+        final List<SubDistrict> subDistrictsAll = new Gson().fromJson(readFromFile("tambons.json", context), new TypeToken<List<SubDistrict>>(){}.getType());
 
-        districtsNew = districts;
-        subDistrictsNew = subDistricts;
+        districts = districtsAll;
+        subDistricts = subDistrictsAll;
 
         List<String> pList = new ArrayList<>();
-        for (int i = 0; i < provinces.size(); i++) {
-            Province province = provinces.get(i);
+        for (Province province : provincesAll) {
             pList.add(province.getName());
         }
 
         setupSpinnerAdapter(context, pList, snProvince);
 
-
         snProvince.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Province province = provinces.get(position);
-                listener.onProvinceSelect(province);
-
-                districtList = new ArrayList<>();
-                districtsNew = new ArrayList<>();
+                Province province = provincesAll.get(position);
+                List<String> districtList = new ArrayList<>();
+                districts = new ArrayList<>();
                 for (District district : districts) {
                     if (district.getProvinceId().equals(province.getId())) {
-                        districtsNew.add(district);
+                        districts.add(district);
                         districtList.add(district.getName());
                     }
                 }
 
                 setupSpinnerAdapter(context, districtList, snDistrict);
+
+                if (listener != null) {
+                    listener.onProvinceSelect(province);
+                }
             }
 
             @Override
@@ -71,19 +67,21 @@ public class AddressManager {
         snDistrict.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                District district = districtsNew.get(position);
-                listener.onDistrictSelect(district);
-
-                subDistrictList = new ArrayList<>();
-                subDistrictsNew = new ArrayList<>();
+                District district = districts.get(position);
+                List<String> subDistrictList = new ArrayList<>();
+                subDistricts = new ArrayList<>();
                 for (SubDistrict subDistrict : subDistricts) {
                     if (subDistrict.getProvinceId().equals(district.getProvinceId()) && subDistrict.getDistroctId().equals(district.getId())) {
-                        subDistrictsNew.add(subDistrict);
+                        subDistricts.add(subDistrict);
                         subDistrictList.add(subDistrict.getName());
                     }
                 }
 
                 setupSpinnerAdapter(context, subDistrictList, snSubDistrict);
+
+                if (listener != null) {
+                    listener.onDistrictSelect(district);
+                }
             }
 
             @Override
@@ -95,8 +93,10 @@ public class AddressManager {
         snSubDistrict.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                SubDistrict subDistrict = subDistrictsNew.get(position);
-                listener.onSubDistrictSelect(subDistrict);
+                SubDistrict subDistrict = subDistricts.get(position);
+                if (listener != null) {
+                    listener.onSubDistrictSelect(subDistrict);
+                }
             }
 
             @Override
